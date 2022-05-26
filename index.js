@@ -28,17 +28,27 @@ async function run() {
             const result = await toolsCollection.find(query).toArray();
             res.send(result)
         })
+
         app.get('/tools/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const query = { _id: ObjectId(id) };
+            console.log(query);
             const result = await toolsCollection.findOne(query);
+
             res.send(result)
         })
         app.post('/orders', async (req, res) => {
             const order = req.body;
             const result = await ordersCollection.insertOne(order)
             res.send(result);
+        })
+        app.get('/orders/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log('email', email);
+            const filter = { email: email }
+            const result = await ordersCollection.find(filter).toArray();
+            res.send(result)
+
         })
     }
     finally {
