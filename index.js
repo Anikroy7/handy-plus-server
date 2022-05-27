@@ -69,6 +69,16 @@ async function run() {
             const result = await userCollection.find(query).toArray();
             res.send(result)
         })
+        app.put('/user/admin/:email', verifyJwt, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email }
+            const updateDoc = {
+                $set: { role: 'admin' }
+            }
+            const result = await userCollection.updateOne(filter, updateDoc)
+            res.send(result)
+
+        })
 
         app.get('/tools', async (req, res) => {
             const query = {};
