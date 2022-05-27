@@ -23,6 +23,8 @@ async function run() {
         await client.connect();
         const toolsCollection = client.db('handyPlus').collection('tools');
         const ordersCollection = client.db('handyPlus').collection('orders')
+        const reviwesCollection = client.db('handyPlus').collection('reviews')
+        const profilesCollection = client.db('handyPlus').collection('profiles')
         app.get('/tools', async (req, res) => {
             const query = {};
             const result = await toolsCollection.find(query).toArray();
@@ -57,6 +59,29 @@ async function run() {
             const result = await ordersCollection.deleteOne(query);
             res.send(result)
         })
+        app.get('/reviews', async (req, res) => {
+            const query = {};
+            const result = await reviwesCollection.find(query).toArray()
+            res.send(result);
+        })
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviwesCollection.insertOne(review)
+            res.send(result)
+        })
+        app.put('/profile/:email', async (req, res) => {
+
+            const email = req.params.email;
+            const options = { upsert: true };
+            const filter = { email: email };
+            const doc = req.body;
+            const updateDoc = {
+                $set: doc
+            };
+            const result = await profilesCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
+
     }
     finally {
         // await client.close();
