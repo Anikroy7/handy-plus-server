@@ -98,6 +98,12 @@ async function run() {
             res.send({ admin: isAdmin })
         })
 
+        app.post('/tools', async (req, res) => {
+            const tools = req.body;
+            const result = await toolsCollection.insertOne(tools)
+            res.send(result);
+        })
+
         app.get('/tools', async (req, res) => {
             const query = {};
             const result = await toolsCollection.find(query).toArray();
