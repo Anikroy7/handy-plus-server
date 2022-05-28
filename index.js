@@ -48,6 +48,18 @@ async function run() {
         const userCollection = client.db('handyPlus').collection('users')
 
 
+
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req?.decoded?.email;
+            const requesterAccount = await userCollection.findOne({ email: requester })
+            if (requesterAccount.role === 'admin') {
+                next()
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidden accsess' })
+            }
+        }
+
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const options = { upsert: true };
@@ -69,7 +81,7 @@ async function run() {
             const result = await userCollection.find(query).toArray();
             res.send(result)
         })
-        app.put('/user/admin/:email', verifyJwt, async (req, res) => {
+        app.put('/user/admin/:email', verifyJwt, verifyAdmin, async (req, res) => {
             const email = req.params.email;
             const filter = { email: email }
             const updateDoc = {
@@ -79,10 +91,22 @@ async function run() {
             res.send(result)
 
         })
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email })
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+        })
 
         app.get('/tools', async (req, res) => {
             const query = {};
             const result = await toolsCollection.find(query).toArray();
+            res.send(result)
+        })
+        app.delete('/tools/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await toolsCollection.deleteOne(query);
             res.send(result)
         })
 
@@ -98,6 +122,11 @@ async function run() {
             const order = req.body;
             const result = await ordersCollection.insertOne(order)
             res.send(result);
+        })
+        app.get('/orders', async (req, res) => {
+            const query = {};
+            const result = await ordersCollection.find(query).toArray()
+            res.send(result)
         })
         app.get('/orders/:email', verifyJwt, async (req, res) => {
             console.log('fromdecc', req.decoded)
