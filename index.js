@@ -19,9 +19,11 @@ app.get('/', (req, res) => {
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7wku5.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-console.log(uri);
-function verifyJwt(req, res, next) {
 
+
+// verify jwt for authentic user
+
+function verifyJwt(req, res, next) {
     const auth = req.headers.authorization;
     console.log('from jwt again', auth);
     if (!auth) {
